@@ -1,4 +1,4 @@
-;;;; Copyright(c) 2010 Joseph Donaldson(donaldsonjw@yahoo.com) 
+;;;; Copyright(c) 2010, 2011, 2012 Joseph Donaldson(donaldsonjw@yahoo.com) 
 ;;;; This file is part of Templater.
 ;;;;
 ;;;;     Templater is free software: you can redistribute it and/or modify
@@ -33,7 +33,8 @@
        (when (not (string=? "" load-path))
 	  (templater-load-path-add! res load-path))
        res))
- 
+
+
 
 (define (template-map-put! templater name template)
    (with-access::%templater templater (template-map)
@@ -51,7 +52,8 @@
 	 (set! load-paths (cons path load-paths))))
 
 (define (templater-load-paths templater)
-   (%templater-load-paths templater))
+   (let ((t::%templater templater))
+      (-> t load-paths)))
 
 (define (templater-get-template templater template-name)
    (let ((res (template-map-get templater template-name)))
@@ -432,7 +434,6 @@
    (read/lalrp +templater-parser+ +templater-tokenizer+ input))
 
 ;;;; template application
-
 (define (templater-apply-template templater template attribs)
    (define (template-apply templater template attribs)
       (if (pair? template)

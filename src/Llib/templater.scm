@@ -20,7 +20,8 @@
            (templater-load-path-add! templater path)
 	   (templater-load-paths templater)
 	   (templater-apply-template templater template attribs)
-	   (templater-get-template templater template-name))
+	   (templater-get-template templater template-name)
+	   (templater-flush-templates! templater))
    (static
     (class %templater
        template-map
@@ -35,6 +36,9 @@
        res))
 
 
+(define (templater-flush-templates! templater)
+   (with-access::%templater templater (template-map)
+	 (set! template-map (create-hashtable))))
 
 (define (template-map-put! templater name template)
    (with-access::%templater templater (template-map)
@@ -63,11 +67,15 @@
 					  "." +template-ext+))
 		 (file (find-file/path file-name (templater-load-paths templater))))
 	     (if file
-		 (with-input-from-file file
-		    (lambda ()
-		       (templater-template-read (current-input-port))))
+		 (let ((template 
+			  (with-input-from-file file
+			     (lambda ()
+				(templater-template-read
+				   (current-input-port))))))
+		    (template-map-put! templater template-name template)
+		    template)
 		 (error "templater-get-template" "template not found"
-			template-name))))))
+		    template-name))))))
 		       
 	     
 	     

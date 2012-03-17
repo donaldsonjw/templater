@@ -194,8 +194,9 @@
    (regular-grammar ()
       (#\$
        'dollar)
-      ((+ (or "\\$"
-	      (out #\$ )))
+      ("\\$"
+	 (cons 'string "$"))
+      ((+ (out #\$ ))
        (cons 'string (the-string)))
       (else
        (let ((char (the-failure)))
